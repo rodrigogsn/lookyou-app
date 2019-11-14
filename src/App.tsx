@@ -81,7 +81,8 @@ class App extends React.Component<{}, AppState> {
     return (
       <IonApp>
         <IonReactRouter>
-          {this.state.currentRoute == "/login" || this.state.currentRoute == "/"
+          {this.state.currentRoute === "/login" ||
+          this.state.currentRoute === "/"
             ? router
             : tabs}
         </IonReactRouter>

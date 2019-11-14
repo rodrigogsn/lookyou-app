@@ -27,7 +27,6 @@ import {
 } from "@ionic/react";
 import { add } from "ionicons/icons";
 import React from "react";
-import "./Tab1.css";
 
 type Tab1State = {
   view: string;
