@@ -36,18 +36,34 @@ import "@ionic/react/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <Route path="/" render={() => <Redirect to="/login" />} exact={true} />
-      <Route path="/login" component={Login} exact={true} />
+type AppState = {
+  currentRoute: string;
+};
+
+class App extends React.Component<{}, AppState> {
+  constructor(props: any) {
+    super(props);
+
+    this.state = {
+      currentRoute: window.location.pathname
+    };
+  }
+
+  render() {
+    const router = (
+      <IonRouterOutlet>
+        <Route path="/" render={() => <Redirect to="/login" />} exact={true} />
+        <Route path="/login" component={Login} exact={true} />
+        <Route path="/tab1" component={Tab1} exact={true} />
+        <Route path="/tab2" component={Tab2} exact={true} />
+        <Route path="/tab2/details" component={Details} />
+        <Route path="/tab3" component={Tab3} />
+      </IonRouterOutlet>
+    );
+
+    const tabs = (
       <IonTabs>
-        <IonRouterOutlet>
-          <Route path="/tab1" component={Tab1} exact={true} />
-          <Route path="/tab2" component={Tab2} exact={true} />
-          <Route path="/tab2/details" component={Details} />
-          <Route path="/tab3" component={Tab3} />
-        </IonRouterOutlet>
+        {router}
         <IonTabBar slot="bottom">
           <IonTabButton tab="tab1" href="/tab1">
             <IonIcon icon={flash} />
@@ -63,8 +79,17 @@ const App: React.FC = () => (
           </IonTabButton>
         </IonTabBar>
       </IonTabs>
-    </IonReactRouter>
-  </IonApp>
-);
+    );
+    return (
+      <IonApp>
+        <IonReactRouter>
+          {this.state.currentRoute == "/login" || this.state.currentRoute == "/"
+            ? router
+            : tabs}
+        </IonReactRouter>
+      </IonApp>
+    );
+  }
+}
 
 export default App;
