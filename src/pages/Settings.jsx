@@ -1,23 +1,23 @@
 import React from "react";
 import {
+  IonContent,
   IonHeader,
-  IonToolbar,
   IonPage,
   IonTitle,
-  IonContent
+  IonToolbar
 } from "@ionic/react";
 
-const Tab3Page: React.FC = () => {
+const SettingsPage = () => {
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Testing Login</IonTitle>
+          <IonTitle>Configurações</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent />
+      <IonContent></IonContent>
     </IonPage>
   );
 };
 
-export default Tab3Page;
+export default SettingsPage;

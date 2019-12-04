@@ -37,7 +37,7 @@ const changeView = (newView, setView) => {
   setView(newView);
 };
 
-const Tab2 = () => {
+const GalleryPage = () => {
   const [view, setView] = useState("pictures");
   const { state, dispatch } = useContext(AppContext);
   console.log(state);
@@ -153,4 +153,4 @@ const Tab2 = () => {
   );
 };
 
-export default Tab2;
+export default GalleryPage;
