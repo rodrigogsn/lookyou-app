@@ -12,6 +12,7 @@ import {
 import { IonReactRouter } from "@ionic/react-router";
 import { shirt, calendar, settings } from "ionicons/icons";
 import { AppContextProvider } from "./State";
+import Gallery from "./pages/Gallery";
 import Tab1 from "./pages/Tab1";
 import Tab2 from "./pages/Tab2";
 import Tab3 from "./pages/Tab3";
@@ -54,6 +55,7 @@ class App extends React.Component<{}, AppState> {
       <IonRouterOutlet>
         <Route path="/" render={() => <Redirect to="/login" />} exact={true} />
         <Route path="/login" component={Login} exact={true} />
+        <Route path="/gallery" component={Gallery} exact={true} />
         <Route path="/tab1" component={Tab1} exact={true} />
         <Route path="/tab2" component={Tab2} exact={true} />
         <Route path="/tab3" component={Tab3} />

@@ -26,7 +26,7 @@ const loginUser = (props, email, password, dispatch) => {
         login_data: firebaseUser
       });
 
-      props.history.push("/tab1");
+      props.history.push("/gallery");
     },
     error => {
       console.log(error);
