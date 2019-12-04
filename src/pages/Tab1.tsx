@@ -25,8 +25,11 @@ import {
   IonSegmentButton,
   IonButton
 } from "@ionic/react";
-import { add } from "ionicons/icons";
+import { add, camera, image } from "ionicons/icons";
 import React from "react";
+
+import dummy1 from "../assets/img/dummy-1x1.png";
+import dummy2 from "../assets/img/dummy-3x5.png";
 
 type Tab1State = {
   view: string;
@@ -49,10 +52,36 @@ class Tab1 extends React.Component<{}, Tab1State> {
 
     if (this.state.view == "pictures") {
       viewContent = (
-        <IonGrid>
+        <IonGrid fixed>
           <IonRow>
-            <IonCol>
-              <IonImg src="" />
+            <IonCol size="4">
+              <IonImg src={dummy1} />
+            </IonCol>
+            <IonCol size="4">
+              <IonImg src={dummy2} />
+            </IonCol>
+            <IonCol size="4">
+              <IonImg src={dummy1} />
+            </IonCol>
+
+            <IonCol size="4">
+              <IonImg src={dummy1} />
+            </IonCol>
+            <IonCol size="4">
+              <IonImg src={dummy1} />
+            </IonCol>
+            <IonCol size="4">
+              <IonImg src={dummy2} />
+            </IonCol>
+
+            <IonCol size="4">
+              <IonImg src={dummy1} />
+            </IonCol>
+            <IonCol size="4">
+              <IonImg src={dummy1} />
+            </IonCol>
+            <IonCol size="4">
+              <IonImg src={dummy1} />
             </IonCol>
           </IonRow>
         </IonGrid>
@@ -60,16 +89,18 @@ class Tab1 extends React.Component<{}, Tab1State> {
     } else {
       viewContent = (
         <IonCard>
-          <img src="/assets/shapes.svg" alt="" />
           <IonCardHeader>
-            <IonCardSubtitle>Get Started</IonCardSubtitle>
-            <IonCardTitle>Welcome to Ionic</IonCardTitle>
+            <IonCardSubtitle>Look 1</IonCardSubtitle>
+            <IonCardTitle>Look Especial de Teste</IonCardTitle>
           </IonCardHeader>
           <IonCardContent>
             <IonGrid>
               <IonRow>
-                <IonCol>
-                  <IonImg src="" />
+                <IonCol size="4">
+                  <IonImg src={dummy1} />
+                  <IonImg src={dummy2} />
+                  <IonImg src={dummy1} />
+                  <IonImg src={dummy1} />
                 </IonCol>
                 <IonButton>
                   <IonIcon icon={add}></IonIcon>
@@ -110,8 +141,18 @@ class Tab1 extends React.Component<{}, Tab1State> {
 
           <IonFab vertical="bottom" horizontal="end" slot="fixed">
             <IonFabButton>
-              <IonIcon></IonIcon>
+              <IonIcon icon={add}></IonIcon>
             </IonFabButton>
+
+            <IonFabList side="top">
+              <IonFabButton>
+                <IonIcon icon={image}></IonIcon>
+              </IonFabButton>
+
+              <IonFabButton>
+                <IonIcon icon={camera}></IonIcon>
+              </IonFabButton>
+            </IonFabList>
           </IonFab>
         </IonContent>
       </IonPage>
