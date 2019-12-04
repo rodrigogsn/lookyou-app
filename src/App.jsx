@@ -42,7 +42,12 @@ import "./theme/variables.css";
 const App = () => {
   const [currentRoute, setCurrentRoute] = useState(window.location.pathname);
 
+  console.log(currentRoute);
+
   const PrivateRoute = ({ component: Component, ...rest }) => {
+    if (currentRoute === "/login" || currentRoute === "/") {
+      console.log("aqui");
+    }
     const { state } = useContext(AppContext);
     return (
       <Route
@@ -58,40 +63,36 @@ const App = () => {
     );
   };
 
-  const router = (
-    <IonRouterOutlet>
-      <Route path="/" render={() => <Redirect to="/login" />} exact={true} />
-      <Route path="/login" component={Login} exact={true} />
-      <PrivateRoute path="/gallery" component={Gallery} exact={true} />
-      <PrivateRoute path="/calendar" component={Calendar} exact={true} />
-      <PrivateRoute path="/settings" component={Settings} exact={true} />
-    </IonRouterOutlet>
-  );
-
-  const tabs = (
-    <IonTabs>
-      {router}
-      <IonTabBar slot="bottom">
-        <IonTabButton tab="tab1" href="/tab1">
-          <IonIcon icon={flash} />
-          <IonLabel>Tab One</IonLabel>
-        </IonTabButton>
-        <IonTabButton tab="tab2" href="/tab2">
-          <IonIcon icon={apps} />
-          <IonLabel>Tab Two</IonLabel>
-        </IonTabButton>
-        <IonTabButton tab="tab3" href="/tab3">
-          <IonIcon icon={send} />
-          <IonLabel>Tab Three</IonLabel>
-        </IonTabButton>
-      </IonTabBar>
-    </IonTabs>
-  );
-
   return (
     <IonApp>
       <IonReactRouter>
-        {currentRoute === "/login" || currentRoute === "/" ? router : tabs}
+        <IonTabs>
+          <IonRouterOutlet>
+            <Route
+              path="/"
+              render={() => <Redirect to="/login" />}
+              exact={true}
+            />
+            <Route path="/login" component={Login} exact={true} />
+            <PrivateRoute path="/gallery" component={Gallery} exact={true} />
+            <PrivateRoute path="/calendar" component={Calendar} exact={true} />
+            <PrivateRoute path="/settings" component={Settings} exact={true} />
+          </IonRouterOutlet>
+          <IonTabBar slot="bottom">
+            <IonTabButton tab="tab1" href="/tab1">
+              <IonIcon icon={flash} />
+              <IonLabel>Tab One</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="tab2" href="/tab2">
+              <IonIcon icon={apps} />
+              <IonLabel>Tab Two</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="tab3" href="/tab3">
+              <IonIcon icon={send} />
+              <IonLabel>Tab Three</IonLabel>
+            </IonTabButton>
+          </IonTabBar>
+        </IonTabs>
       </IonReactRouter>
     </IonApp>
   );
