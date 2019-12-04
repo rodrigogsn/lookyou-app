@@ -26,7 +26,8 @@ import {
   IonButton
 } from "@ionic/react";
 import { add } from "ionicons/icons";
-import React from "react";
+import React, { useContext } from "react";
+import { AppContext } from "../State";
 
 type Tab1State = {
   view: string;
@@ -45,6 +46,10 @@ class Tab1 extends React.Component<{}, Tab1State> {
   }
 
   render() {
+    const { state, dispatch } = useContext(AppContext);
+
+    console.log(state);
+
     let viewContent;
 
     if (this.state.view == "pictures") {
