@@ -1,5 +1,4 @@
-import { firebaseDatabase } from "../utils/firebaseUtils";
-import { storage } from "../utils/firebaseUtils";
+import { firebaseDatabase, storage, auth } from "../utils/firebaseUtils";
 
 export default class FirebaseService {
   static getDataList = (nodePath, callback, size = 10) => {
@@ -15,6 +14,22 @@ export default class FirebaseService {
     });
 
     return query;
+  };
+
+  static loginUser = (email, password, login_sucess_func, login_error_func) => {
+    console.log(email, password);
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .then(function(firebaseUser) {
+        login_sucess_func(firebaseUser);
+      })
+      .catch(function(error) {
+        login_error_func(error);
+        // Handle Errors here.
+        // var errorCode = error.code;
+        // var errorMessage = error.message;
+        // ...
+      });
   };
 
   static getImagesStore = () => {};

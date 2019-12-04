@@ -25,8 +25,9 @@ import {
   IonSegmentButton,
   IonButton
 } from "@ionic/react";
-import { add, camera, image } from "ionicons/icons";
 import React from "react";
+import { add, camera, image } from "ionicons/icons";
+import { AppContext } from "../State";
 
 import dummy1 from "../assets/img/dummy-1x1.png";
 import dummy2 from "../assets/img/dummy-3x5.png";
