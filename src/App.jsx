@@ -13,7 +13,7 @@ import {
 import { AppContext } from "./State";
 
 import { IonReactRouter } from "@ionic/react-router";
-import { apps, flash, send } from "ionicons/icons";
+import { shirt, calendar, settings } from "ionicons/icons";
 
 import Gallery from "./pages/Gallery";
 import Calendar from "./pages/Calendar";
@@ -62,9 +62,12 @@ const App = () => {
     <IonRouterOutlet>
       <Route path="/" render={() => <Redirect to="/login" />} exact={true} />
       <Route path="/login" component={Login} exact={true} />
-      <PrivateRoute path="/gallery" component={Gallery} exact={true} />
+      <Route path="/gallery" component={Gallery} exact={true} />
+      <Route path="/calendar" component={Calendar} exact={true} />
+      <Route path="/settings" component={Settings} exact={true} />
+      {/* <PrivateRoute path="/gallery" component={Gallery} exact={true} />
       <PrivateRoute path="/calendar" component={Calendar} exact={true} />
-      <PrivateRoute path="/settings" component={Settings} exact={true} />
+      <PrivateRoute path="/settings" component={Settings} exact={true} /> */}
     </IonRouterOutlet>
   );
 
@@ -72,17 +75,17 @@ const App = () => {
     <IonTabs>
       {router}
       <IonTabBar slot="bottom">
-        <IonTabButton tab="tab1" href="/tab1">
-          <IonIcon icon={flash} />
-          <IonLabel>Tab One</IonLabel>
+        <IonTabButton tab="gallery" href="/gallery">
+          <IonIcon icon={shirt} />
+          <IonLabel>Galeria</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="tab2" href="/tab2">
-          <IonIcon icon={apps} />
-          <IonLabel>Tab Two</IonLabel>
+        <IonTabButton tab="calendar" href="/calendar">
+          <IonIcon icon={calendar} />
+          <IonLabel>Calendário</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="tab3" href="/tab3">
-          <IonIcon icon={send} />
-          <IonLabel>Tab Three</IonLabel>
+        <IonTabButton tab="settings" href="/settings">
+          <IonIcon icon={settings} />
+          <IonLabel>Config</IonLabel>
         </IonTabButton>
       </IonTabBar>
     </IonTabs>
