@@ -1,0 +1,19 @@
+ion-button {
+  margin: 0 !important;
+  --padding-start: 10px !important;
+  --padding-end: 10px !important;
+}
+
+ion-item {
+  position: absolute;
+  right: 0;
+  --inner-padding-end: 0px;
+}
+
+.image-container {
+  max-width: 50px;
+  max-height: 50px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  overflow: hidden;
+}

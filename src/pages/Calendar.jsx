@@ -7,7 +7,21 @@ import {
   IonToolbar
 } from "@ionic/react";
 
-const CalendarPage = () => {
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import moment from "moment";
+
+const localizer = momentLocalizer(moment);
+const myEventsList = [
+  {
+    title: "Teste",
+    start: new Date(),
+    end: new Date(),
+    allDay: true
+  }
+];
+
+const CalendarPage = props => {
   return (
     <IonPage>
       <IonHeader>
@@ -15,7 +29,17 @@ const CalendarPage = () => {
           <IonTitle>Calendário</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent></IonContent>
+      <IonContent>
+        <div>
+          <Calendar
+            localizer={localizer}
+            events={myEventsList}
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: 500 }}
+          />
+        </div>
+      </IonContent>
     </IonPage>
   );
 };
