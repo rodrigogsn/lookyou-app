@@ -42,7 +42,12 @@ import "./theme/variables.css";
 const App = () => {
   const [currentRoute, setCurrentRoute] = useState(window.location.pathname);
 
+  console.log(currentRoute);
+
   const PrivateRoute = ({ component: Component, ...rest }) => {
+    if (currentRoute === "/login" || currentRoute === "/") {
+      console.log("aqui");
+    }
     const { state } = useContext(AppContext);
     return (
       <Route
@@ -58,43 +63,36 @@ const App = () => {
     );
   };
 
-  const router = (
-    <IonRouterOutlet>
-      <Route path="/" render={() => <Redirect to="/login" />} exact={true} />
-      <Route path="/login" component={Login} exact={true} />
-      <Route path="/gallery" component={Gallery} exact={true} />
-      <Route path="/calendar" component={Calendar} exact={true} />
-      <Route path="/settings" component={Settings} exact={true} />
-      {/* <PrivateRoute path="/gallery" component={Gallery} exact={true} />
-      <PrivateRoute path="/calendar" component={Calendar} exact={true} />
-      <PrivateRoute path="/settings" component={Settings} exact={true} /> */}
-    </IonRouterOutlet>
-  );
-
-  const tabs = (
-    <IonTabs>
-      {router}
-      <IonTabBar slot="bottom">
-        <IonTabButton tab="gallery" href="/gallery">
-          <IonIcon icon={shirt} />
-          <IonLabel>Galeria</IonLabel>
-        </IonTabButton>
-        <IonTabButton tab="calendar" href="/calendar">
-          <IonIcon icon={calendar} />
-          <IonLabel>Calendário</IonLabel>
-        </IonTabButton>
-        <IonTabButton tab="settings" href="/settings">
-          <IonIcon icon={settings} />
-          <IonLabel>Config</IonLabel>
-        </IonTabButton>
-      </IonTabBar>
-    </IonTabs>
-  );
-
   return (
     <IonApp>
       <IonReactRouter>
-        {currentRoute === "/login" || currentRoute === "/" ? router : tabs}
+        <IonTabs>
+          <IonRouterOutlet>
+            <Route
+              path="/"
+              render={() => <Redirect to="/login" />}
+              exact={true}
+            />
+            <Route path="/login" component={Login} exact={true} />
+            <PrivateRoute path="/gallery" component={Gallery} exact={true} />
+            <PrivateRoute path="/calendar" component={Calendar} exact={true} />
+            <PrivateRoute path="/settings" component={Settings} exact={true} />
+          </IonRouterOutlet>
+          <IonTabBar slot="bottom">
+            <IonTabButton tab="gallery" href="/gallery">
+              <IonIcon icon={shirt} />
+              <IonLabel>Galeria</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="calendar" href="/calendar">
+              <IonIcon icon={calendar} />
+              <IonLabel>Calendário</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="settings" href="/settings">
+              <IonIcon icon={settings} />
+              <IonLabel>Config</IonLabel>
+            </IonTabButton>
+          </IonTabBar>
+        </IonTabs>
       </IonReactRouter>
     </IonApp>
   );
