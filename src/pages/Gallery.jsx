@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   IonCard,
   IonCardContent,
@@ -28,6 +28,8 @@ import {
 } from "@ionic/react";
 import { AppContext } from "../State";
 
+import FirebaseService from "../services/FirebaseService";
+
 import { add, camera, image } from "ionicons/icons";
 
 import dummy1 from "../assets/img/dummy-1x1.png";
@@ -39,45 +41,49 @@ const changeView = (newView, setView) => {
 
 const GalleryPage = () => {
   const [view, setView] = useState("pictures");
+  const [itensRef, setItensRef] = useState([]);
+  const [imagesURL, setImagesURL] = useState([]);
+
   const { state, dispatch } = useContext(AppContext);
-  console.log(state);
+
+  const fetchImages = async => {
+    FirebaseService.getImagesStore(
+      async images => {
+        setItensRef(images);
+
+        var promises = images.items.map(async function(reference) {
+          return await reference.getDownloadURL();
+        });
+
+        const urls = await Promise.all(promises);
+
+        setImagesURL(urls);
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  };
+
+  //GET ALL IMAGES
+  useEffect(() => {
+    fetchImages();
+  }, []);
 
   let viewContent;
+
+  const cols = imagesURL.map(function(item, i) {
+    return (
+      <IonCol size="4" key={i}>
+        <IonImg src={item} />
+      </IonCol>
+    );
+  });
 
   if (view === "pictures") {
     viewContent = (
       <IonGrid fixed>
-        <IonRow>
-          <IonCol size="4">
-            <IonImg src={dummy1} />
-          </IonCol>
-          <IonCol size="4">
-            <IonImg src={dummy2} />
-          </IonCol>
-          <IonCol size="4">
-            <IonImg src={dummy1} />
-          </IonCol>
-
-          <IonCol size="4">
-            <IonImg src={dummy1} />
-          </IonCol>
-          <IonCol size="4">
-            <IonImg src={dummy1} />
-          </IonCol>
-          <IonCol size="4">
-            <IonImg src={dummy2} />
-          </IonCol>
-
-          <IonCol size="4">
-            <IonImg src={dummy1} />
-          </IonCol>
-          <IonCol size="4">
-            <IonImg src={dummy1} />
-          </IonCol>
-          <IonCol size="4">
-            <IonImg src={dummy1} />
-          </IonCol>
-        </IonRow>
+        <IonRow>{cols}</IonRow>
       </IonGrid>
     );
   } else {

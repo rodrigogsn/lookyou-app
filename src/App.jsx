@@ -40,14 +40,7 @@ import "@ionic/react/css/display.css";
 import "./theme/variables.css";
 
 const App = () => {
-  const [currentRoute, setCurrentRoute] = useState(window.location.pathname);
-
-  console.log(currentRoute);
-
   const PrivateRoute = ({ component: Component, ...rest }) => {
-    if (currentRoute === "/login" || currentRoute === "/") {
-      console.log("aqui");
-    }
     const { state } = useContext(AppContext);
     return (
       <Route
@@ -74,7 +67,7 @@ const App = () => {
               exact={true}
             />
             <Route path="/login" component={Login} exact={true} />
-            <PrivateRoute path="/gallery" component={Gallery} exact={true} />
+            <Route path="/gallery" component={Gallery} exact={true} />
             <PrivateRoute path="/calendar" component={Calendar} exact={true} />
             <PrivateRoute path="/settings" component={Settings} exact={true} />
           </IonRouterOutlet>

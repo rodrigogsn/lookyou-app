@@ -1,5 +1,7 @@
 {
   "name": "lookyou-react",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "react"
 }

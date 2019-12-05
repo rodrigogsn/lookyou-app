@@ -16,15 +16,28 @@ import logo from "../assets/img/logo.png";
 
 import FirebaseService from "../services/FirebaseService";
 
+import { Plugins } from "@capacitor/core";
+
+const { Storage } = Plugins;
+
+const setObject = async (name, value) => {
+  await Storage.set({
+    key: name,
+    value: JSON.stringify(value)
+  });
+};
+
 const loginUser = (props, email, password, dispatch) => {
   FirebaseService.loginUser(
     email,
     password,
-    firebaseUser => {
+    async firebaseUser => {
       dispatch({
         type: "setLogin",
         login_data: firebaseUser
       });
+
+      setObject("user", firebaseUser);
 
       props.history.push("/gallery");
     },
