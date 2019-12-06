@@ -157,7 +157,7 @@ const GalleryPage = () => {
   }
 
   return (
-    <IonPage>
+    <IonPage className="gallery-page">
       <IonContent>
         <IonText>
           <h1>Guarda-Roupa</h1>
