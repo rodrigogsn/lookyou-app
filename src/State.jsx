@@ -1,9 +1,23 @@
-import React, { createContext, useReducer } from "react";
+import React, { createContext, useReducer, useEffect } from "react";
+
+import { Plugins } from "@capacitor/core";
+
+const { Storage } = Plugins;
+
+async function getObject(name) {
+  // return new Promise(async resolve => {
+  //   Storage.get({ key: name }).then(data => {
+  //     resolve(JSON.parse(data.value));
+  //   });
+  // });
+  const ret = await Storage.get({ key: "user" });
+  return JSON.parse(ret.value);
+}
 
 let AppContext = createContext();
 
 const initialState = {
-  login_data: null
+  login_data: getObject("user")
 };
 
 let reducer = (state, action) => {
@@ -17,7 +31,9 @@ let reducer = (state, action) => {
   }
 };
 
-function AppContextProvider(props) {
+console.log(initialState);
+
+const AppContextProvider = props => {
   const fullInitialState = {
     ...initialState
   };
@@ -28,7 +44,7 @@ function AppContextProvider(props) {
   return (
     <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
   );
-}
+};
 
 let AppContextConsumer = AppContext.Consumer;
 

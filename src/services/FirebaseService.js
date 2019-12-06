@@ -16,6 +16,15 @@ export default class FirebaseService {
     return query;
   };
 
+  static getCurrentUser(auth) {
+    return new Promise((resolve, reject) => {
+      const unsubscribe = auth.onAuthStateChanged(user => {
+        unsubscribe();
+        resolve(user.uid);
+      }, reject);
+    });
+  }
+
   static loginUser = (email, password, login_sucess_func, login_error_func) => {
     console.log(email, password);
     auth
@@ -32,5 +41,39 @@ export default class FirebaseService {
       });
   };
 
-  static getImagesStore = () => {};
+  static getImagesStore = async (onSucess, onFail) => {
+    const user = await this.getCurrentUser(auth);
+
+    if (user) {
+      storage
+        .ref()
+        .child(`images/${user}`)
+        .listAll()
+        .then(res => onSucess(res))
+        .catch(err => onFail(err));
+    }
+  };
+
+  static removeImage = async (image, onSucess, onFail) => {
+    const user = await this.getCurrentUser(auth);
+    const image_name = image.name.replace(/\.[^/.]+$/, "");
+
+    if (user) {
+      storage
+        .ref()
+        .child(`images/${user}/${image.name}`)
+        .delete()
+        .then(res => {
+          firebaseDatabase
+            .collection("/images/")
+            .doc(image_name)
+            .delete()
+            .then(
+              res => onSucess(res),
+              err => onFail(err)
+            );
+        })
+        .catch(err => onFail(err));
+    }
+  };
 }

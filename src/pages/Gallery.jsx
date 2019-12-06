@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   IonCard,
   IonCardContent,
@@ -25,7 +25,11 @@ import {
 import { AppContext } from "../State";
 import "./Gallery.scss";
 
-import { add, heart, more } from "ionicons/icons";
+import FirebaseService from "../services/FirebaseService";
+
+import ImgsViewer from "react-images-viewer";
+
+import { add, heart, more, open, trash } from "ionicons/icons";
 
 import dummy1 from "../assets/img/dummy-1x1.png";
 import dummy2 from "../assets/img/dummy-3x5.png";
@@ -38,45 +42,77 @@ const GalleryPage = () => {
   const [view, setView] = useState("pictures");
   const [showActionSheet1, setShowActionSheet1] = useState(false);
   const [showActionSheet2, setShowActionSheet2] = useState(false);
+  const [itensRef, setItensRef] = useState([]);
+  const [imagesURL, setImagesURL] = useState([]);
+
+  const [selectedImage, setSelectedImage] = useState(false);
+
+  const [showImageViewer, setShowImageViewer] = useState(false);
+
   const { state, dispatch } = useContext(AppContext);
 
+  const fetchImages = async => {
+    FirebaseService.getImagesStore(
+      async images => {
+        setItensRef(images);
+
+        var promises = images.items.map(async function(reference) {
+          return await reference.getDownloadURL();
+        });
+
+        const urls = await Promise.all(promises);
+
+        setImagesURL(urls);
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  };
+
+  const deleteImage = async image => {
+    console.log(itensRef);
+    if (window.confirm("Are you sure you wish to delete this item?")) {
+      FirebaseService.removeImage(
+        image,
+        async res => {
+          setShowImageViewer(false);
+          fetchImages();
+          console.log(res);
+        },
+        error => {
+          console.log(error);
+        }
+      );
+    }
+  };
+
+  //GET ALL IMAGES
+  useEffect(() => {
+    fetchImages();
+  }, []);
+
   let viewContent;
+
+  const cols = imagesURL.map(function(item, i) {
+    return (
+      <IonCol size="4" key={i}>
+        <IonImg
+          src={item}
+          onClick={() => {
+            setShowImageViewer(true);
+            setSelectedImage(i);
+          }}
+        />
+      </IonCol>
+    );
+  });
 
   if (view === "pictures") {
     viewContent = (
       <>
         <IonGrid fixed>
-          <IonRow>
-            <IonCol size="4">
-              <IonImg src={dummy1} />
-            </IonCol>
-            <IonCol size="4">
-              <IonImg src={dummy2} />
-            </IonCol>
-            <IonCol size="4">
-              <IonImg src={dummy1} />
-            </IonCol>
-
-            <IonCol size="4">
-              <IonImg src={dummy1} />
-            </IonCol>
-            <IonCol size="4">
-              <IonImg src={dummy1} />
-            </IonCol>
-            <IonCol size="4">
-              <IonImg src={dummy2} />
-            </IonCol>
-
-            <IonCol size="4">
-              <IonImg src={dummy1} />
-            </IonCol>
-            <IonCol size="4">
-              <IonImg src={dummy1} />
-            </IonCol>
-            <IonCol size="4">
-              <IonImg src={dummy1} />
-            </IonCol>
-          </IonRow>
+          <IonRow>{cols}</IonRow>
         </IonGrid>
 
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
@@ -214,6 +250,25 @@ const GalleryPage = () => {
             }
           ]}
         ></IonActionSheet>
+        <ImgsViewer
+          imgs={imagesURL.map(function(image) {
+            return { src: image };
+          })}
+          currImg={selectedImage}
+          isOpen={showImageViewer}
+          onClickPrev={() => setSelectedImage(selectedImage - 1)}
+          onClickNext={() => setSelectedImage(selectedImage + 1)}
+          onClose={() => setShowImageViewer(false)}
+          customControls={[
+            <button
+              key="1"
+              className="close_1tcvdj4"
+              onClick={() => deleteImage(itensRef.items[selectedImage])}
+            >
+              <IonIcon color="light" size="large" icon={trash}></IonIcon>
+            </button>
+          ]}
+        />
       </IonContent>
     </IonPage>
   );
