@@ -27,7 +27,9 @@ import "./Gallery.scss";
 
 import FirebaseService from "../services/FirebaseService";
 
-import { add, heart, more } from "ionicons/icons";
+import ImgsViewer from "react-images-viewer";
+
+import { add, heart, more, open, trash } from "ionicons/icons";
 
 import dummy1 from "../assets/img/dummy-1x1.png";
 import dummy2 from "../assets/img/dummy-3x5.png";
@@ -42,6 +44,10 @@ const GalleryPage = () => {
   const [showActionSheet2, setShowActionSheet2] = useState(false);
   const [itensRef, setItensRef] = useState([]);
   const [imagesURL, setImagesURL] = useState([]);
+
+  const [selectedImage, setSelectedImage] = useState(false);
+
+  const [showImageViewer, setShowImageViewer] = useState(false);
 
   const { state, dispatch } = useContext(AppContext);
 
@@ -64,6 +70,23 @@ const GalleryPage = () => {
     );
   };
 
+  const deleteImage = async image => {
+    console.log(itensRef);
+    if (window.confirm("Are you sure you wish to delete this item?")) {
+      FirebaseService.removeImage(
+        image,
+        async res => {
+          setShowImageViewer(false);
+          fetchImages();
+          console.log(res);
+        },
+        error => {
+          console.log(error);
+        }
+      );
+    }
+  };
+
   //GET ALL IMAGES
   useEffect(() => {
     fetchImages();
@@ -74,7 +97,13 @@ const GalleryPage = () => {
   const cols = imagesURL.map(function(item, i) {
     return (
       <IonCol size="4" key={i}>
-        <IonImg src={item} />
+        <IonImg
+          src={item}
+          onClick={() => {
+            setShowImageViewer(true);
+            setSelectedImage(i);
+          }}
+        />
       </IonCol>
     );
   });
@@ -221,6 +250,25 @@ const GalleryPage = () => {
             }
           ]}
         ></IonActionSheet>
+        <ImgsViewer
+          imgs={imagesURL.map(function(image) {
+            return { src: image };
+          })}
+          currImg={selectedImage}
+          isOpen={showImageViewer}
+          onClickPrev={() => setSelectedImage(selectedImage - 1)}
+          onClickNext={() => setSelectedImage(selectedImage + 1)}
+          onClose={() => setShowImageViewer(false)}
+          customControls={[
+            <button
+              key="1"
+              className="close_1tcvdj4"
+              onClick={() => deleteImage(itensRef.items[selectedImage])}
+            >
+              <IonIcon color="light" size="large" icon={trash}></IonIcon>
+            </button>
+          ]}
+        />
       </IonContent>
     </IonPage>
   );
