@@ -44,6 +44,7 @@ const GalleryPage = () => {
   const [showActionSheet2, setShowActionSheet2] = useState(false);
   const [itensRef, setItensRef] = useState([]);
   const [imagesURL, setImagesURL] = useState([]);
+  const [looks, setLooks] = useState([]);
 
   const [selectedImage, setSelectedImage] = useState(false);
 
@@ -63,6 +64,16 @@ const GalleryPage = () => {
         const urls = await Promise.all(promises);
 
         setImagesURL(urls);
+
+        FirebaseService.listLooks(
+          async looks => {
+            setLooks(looks);
+            console.log(looks);
+          },
+          error => {
+            console.log(error);
+          }
+        );
       },
       error => {
         console.log(error);
@@ -71,7 +82,6 @@ const GalleryPage = () => {
   };
 
   const deleteImage = async image => {
-    console.log(itensRef);
     if (window.confirm("Are you sure you wish to delete this item?")) {
       FirebaseService.removeImage(
         image,
@@ -108,6 +118,55 @@ const GalleryPage = () => {
     );
   });
 
+  const look_card = looks.map(function(item, i) {
+    console.log(item);
+    return (
+      <IonCard>
+        <IonItem lines="none">
+          <IonButton
+            color="medium"
+            strong="true"
+            size="large"
+            slot="end"
+            fill="clear"
+          >
+            <IonIcon icon={heart}></IonIcon>
+          </IonButton>
+          <IonButton
+            color="medium"
+            strong="true"
+            size="large"
+            slot="end"
+            fill="clear"
+          >
+            <IonIcon icon={more}></IonIcon>
+          </IonButton>
+        </IonItem>
+        <IonCardHeader>
+          <IonCardSubtitle>Look</IonCardSubtitle>
+          <IonCardTitle>{item.name}</IonCardTitle>
+        </IonCardHeader>
+        <IonCardContent>
+          <IonGrid>
+            <IonRow>
+              {item.images.map(function(image) {
+                return (
+                  <div className="image-container">
+                    <IonImg src={image} />
+                  </div>
+                );
+              })}
+            </IonRow>
+          </IonGrid>
+
+          <IonButton fill="outline">
+            <IonIcon icon={add}></IonIcon> Peças
+          </IonButton>
+        </IonCardContent>
+      </IonCard>
+    );
+  });
+
   if (view === "pictures") {
     viewContent = (
       <>
@@ -125,63 +184,7 @@ const GalleryPage = () => {
   } else {
     viewContent = (
       <>
-        <IonCard>
-          <IonItem lines="none">
-            <IonButton
-              color="medium"
-              strong="true"
-              size="large"
-              slot="end"
-              fill="clear"
-            >
-              <IonIcon icon={heart}></IonIcon>
-            </IonButton>
-            <IonButton
-              color="medium"
-              strong="true"
-              size="large"
-              slot="end"
-              fill="clear"
-            >
-              <IonIcon icon={more}></IonIcon>
-            </IonButton>
-          </IonItem>
-          <IonCardHeader>
-            <IonCardSubtitle>Look</IonCardSubtitle>
-            <IonCardTitle>Look Especial de Teste</IonCardTitle>
-          </IonCardHeader>
-          <IonCardContent>
-            <IonGrid>
-              <IonRow>
-                <div className="image-container">
-                  <IonImg src={dummy1} />
-                </div>
-                <div className="image-container">
-                  <IonImg src={dummy2} />
-                </div>
-                <div className="image-container">
-                  <IonImg src={dummy1} />
-                </div>
-                <div className="image-container">
-                  <IonImg src={dummy1} />
-                </div>
-                <div className="image-container">
-                  <IonImg src={dummy2} />
-                </div>
-                <div className="image-container">
-                  <IonImg src={dummy2} />
-                </div>
-                <div className="image-container">
-                  <IonImg src={dummy1} />
-                </div>
-              </IonRow>
-            </IonGrid>
-
-            <IonButton fill="outline">
-              <IonIcon icon={add}></IonIcon> Peças
-            </IonButton>
-          </IonCardContent>
-        </IonCard>
+        {look_card}
 
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
           <IonFabButton onClick={() => setShowActionSheet2(true)}>
