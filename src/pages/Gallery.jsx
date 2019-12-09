@@ -47,11 +47,8 @@ const GalleryPage = () => {
   const [showActionSheet2, setShowActionSheet2] = useState(false);
   const [itensRef, setItensRef] = useState([]);
   const [imagesURL, setImagesURL] = useState([]);
-<<<<<<< HEAD
   const [picture, setPicture] = useState([]);
-=======
   const [looks, setLooks] = useState([]);
->>>>>>> dbdae620e1aae4c4ed81624016d7f87e853eeccf
 
   const [selectedImage, setSelectedImage] = useState(false);
 
