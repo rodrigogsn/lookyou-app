@@ -76,4 +76,24 @@ export default class FirebaseService {
         .catch(err => onFail(err));
     }
   };
+
+  static listLooks = async (onSucess, onFail) => {
+    const user = await this.getCurrentUser(auth);
+
+    if (user) {
+      firebaseDatabase
+        .collection("looks")
+        .where("user_id", "==", user)
+        .get()
+        .then(res => {
+          let data = [];
+
+          res.forEach(doc => {
+            data.push(doc.data());
+          });
+          onSucess(data);
+        })
+        .catch(err => onFail(err));
+    }
+  };
 }
