@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { Plugins, CameraResultType } from "@capacitor/core";
 import {
   IonCard,
   IonCardContent,
@@ -29,10 +30,12 @@ import FirebaseService from "../services/FirebaseService";
 
 import ImgsViewer from "react-images-viewer";
 
-import { add, heart, more, open, trash } from "ionicons/icons";
+import { add, heart, more, trash } from "ionicons/icons";
 
 import dummy1 from "../assets/img/dummy-1x1.png";
 import dummy2 from "../assets/img/dummy-3x5.png";
+
+const { Camera } = Plugins;
 
 const changeView = (newView, setView) => {
   setView(newView);
@@ -44,6 +47,7 @@ const GalleryPage = () => {
   const [showActionSheet2, setShowActionSheet2] = useState(false);
   const [itensRef, setItensRef] = useState([]);
   const [imagesURL, setImagesURL] = useState([]);
+  const [picture, setPicture] = useState([]);
 
   const [selectedImage, setSelectedImage] = useState(false);
 
@@ -85,6 +89,17 @@ const GalleryPage = () => {
         }
       );
     }
+  };
+
+  const takePicture = async () => {
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Uri
+    });
+
+    let pictureURL = image.webPath;
+    setPicture(pictureURL);
   };
 
   //GET ALL IMAGES
@@ -226,7 +241,7 @@ const GalleryPage = () => {
             {
               text: "Tirar Foto",
               handler: () => {
-                console.log("Tirar Foto");
+                takePicture();
               }
             },
             {

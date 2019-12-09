@@ -1,8 +1,8 @@
 {
   "appId": "br.com.lookyou",
-  "appName": "lookyou",
+  "appName": "Lookyou",
   "bundledWebRuntime": false,
   "npmClient": "yarn",
-  "webDir": "public",
+  "webDir": "build",
   "cordova": {}
 }
