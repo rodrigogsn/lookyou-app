@@ -105,11 +105,21 @@ const GalleryPage = () => {
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: false,
-      resultType: CameraResultType.Uri
+      resultType: CameraResultType.DataUrl
     });
 
-    let pictureURL = image.webPath;
+    let pictureURL = image.dataUrl;
+
     setPicture(pictureURL);
+
+    FirebaseService.uploadImage(pictureURL, 
+    async res => {
+      fetchImages();
+      console.log(res);
+    },
+    error => {
+      console.log(error);
+    });
   };
 
   //GET ALL IMAGES
@@ -190,7 +200,7 @@ const GalleryPage = () => {
         </IonGrid>
 
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton onClick={() => setShowActionSheet1(true)}>
+          <IonFabButton onClick={() => takePicture()}>
             <IonIcon icon={add}></IonIcon>
           </IonFabButton>
         </IonFab>
