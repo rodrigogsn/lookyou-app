@@ -21,7 +21,8 @@ import {
   IonSegmentButton,
   IonButton,
   IonText,
-  IonActionSheet
+  IonActionSheet,
+  IonLoading
 } from "@ionic/react";
 import { AppContext } from "../State";
 import "./Gallery.scss";
@@ -31,9 +32,6 @@ import FirebaseService from "../services/FirebaseService";
 import ImgsViewer from "react-images-viewer";
 
 import { add, heart, more, trash } from "ionicons/icons";
-
-import dummy1 from "../assets/img/dummy-1x1.png";
-import dummy2 from "../assets/img/dummy-3x5.png";
 
 const { Camera } = Plugins;
 
@@ -50,36 +48,44 @@ const GalleryPage = () => {
   const [picture, setPicture] = useState([]);
   const [looks, setLooks] = useState([]);
 
+  const [loading, setLoading] = useState({
+    show: false,
+    message: "Carregando..."
+  });
+
   const [selectedImage, setSelectedImage] = useState(false);
 
   const [showImageViewer, setShowImageViewer] = useState(false);
 
   const { state, dispatch } = useContext(AppContext);
 
-  const fetchImages = async => {
+  const fetchImages = async (showLoading = true) => {
+    if (showLoading) {
+      setLoading({ show: true, message: "Carregando imagens..." });
+    }
     FirebaseService.getImagesStore(
       async images => {
         setItensRef(images);
 
-        var promises = images.items.map(async function(reference) {
-          return await reference.getDownloadURL();
+        var urls = images.map(function(item) {
+          return item.url;
         });
-
-        const urls = await Promise.all(promises);
 
         setImagesURL(urls);
 
         FirebaseService.listLooks(
           async looks => {
             setLooks(looks);
-            console.log(looks);
+            setLoading({ show: false, message: "Carregando imagens..." });
           },
           error => {
+            setLoading({ show: false, message: "Carregando imagens..." });
             console.log(error);
           }
         );
       },
       error => {
+        setLoading({ show: false, message: "Carregando imagens..." });
         console.log(error);
       }
     );
@@ -87,14 +93,16 @@ const GalleryPage = () => {
 
   const deleteImage = async image => {
     if (window.confirm("Are you sure you wish to delete this item?")) {
+      setLoading({ show: true, message: "Deletando imagem..." });
       FirebaseService.removeImage(
         image,
         async res => {
           setShowImageViewer(false);
-          fetchImages();
+          fetchImages(false);
           console.log(res);
         },
         error => {
+          setLoading({ show: false, message: "Deletando imagem..." });
           console.log(error);
         }
       );
@@ -112,14 +120,19 @@ const GalleryPage = () => {
 
     setPicture(pictureURL);
 
-    FirebaseService.uploadImage(pictureURL, 
-    async res => {
-      fetchImages();
-      console.log(res);
-    },
-    error => {
-      console.log(error);
-    });
+    setLoading({ show: true, message: "Salvando Imagem..." });
+
+    FirebaseService.uploadImage(
+      pictureURL,
+      async res => {
+        fetchImages(false);
+        console.log(res);
+      },
+      error => {
+        setLoading({ show: false, message: "Salvando Imagem..." });
+        console.log(error);
+      }
+    );
   };
 
   //GET ALL IMAGES
@@ -291,11 +304,18 @@ const GalleryPage = () => {
             <button
               key="1"
               className="close_1tcvdj4"
-              onClick={() => deleteImage(itensRef.items[selectedImage])}
+              onClick={() => deleteImage(itensRef[selectedImage])}
             >
               <IonIcon color="light" size="large" icon={trash}></IonIcon>
             </button>
           ]}
+        />
+        <IonLoading
+          isOpen={loading.show}
+          onDidDismiss={() =>
+            setLoading({ show: false, message: "Carregando..." })
+          }
+          message={loading.message}
         />
       </IonContent>
     </IonPage>

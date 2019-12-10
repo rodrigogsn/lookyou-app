@@ -6,7 +6,8 @@ import {
   IonInput,
   IonButton,
   IonText,
-  IonImg
+  IonImg,
+  IonLoading
 } from "@ionic/react";
 
 import { AppContext } from "../State";
@@ -27,31 +28,40 @@ const setObject = async (name, value) => {
   });
 };
 
-const loginUser = (props, email, password, dispatch) => {
-  FirebaseService.loginUser(
-    email,
-    password,
-    async firebaseUser => {
-      dispatch({
-        type: "setLogin",
-        login_data: firebaseUser
-      });
-
-      setObject("user", firebaseUser);
-
-      props.history.push("/gallery");
-    },
-    error => {
-      console.log(error);
-    }
-  );
-};
-
 const Login = props => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [loading, setLoading] = useState({
+    show: false,
+    message: "Carregando..."
+  });
+
   const { state, dispatch } = useContext(AppContext);
+
+  const loginUser = (props, email, password, dispatch) => {
+    setLoading({ show: true, message: "Carregando..." });
+    FirebaseService.loginUser(
+      email,
+      password,
+      async firebaseUser => {
+        dispatch({
+          type: "setLogin",
+          login_data: firebaseUser
+        });
+
+        setObject("user", firebaseUser);
+
+        setLoading({ show: false, message: "Carregando..." });
+
+        props.history.push("/gallery");
+      },
+      error => {
+        setLoading({ show: false, message: "Carregando..." });
+        console.log(error);
+      }
+    );
+  };
 
   return (
     <IonContent>
@@ -87,6 +97,13 @@ const Login = props => {
           Ainda não tem uma conta? <a>Crie sua conta.</a>
         </p>
       </IonText>
+      <IonLoading
+        isOpen={loading.show}
+        onDidDismiss={() =>
+          setLoading({ show: false, message: "Carregando..." })
+        }
+        message={loading.message}
+      />
     </IonContent>
   );
 };

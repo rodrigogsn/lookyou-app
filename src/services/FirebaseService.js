@@ -104,34 +104,29 @@ export default class FirebaseService {
   static getImagesStore = async (onSucess, onFail) => {
     const user = await this.getCurrentUser(auth);
 
-    if (user) {
-      storage
-        .ref()
-        .child(`images/${user}`)
-        .listAll()
-        .then(res => onSucess(res))
-        .catch(err => onFail(err));
+    try {
+      const images = await api.get(`/images?user_id=${user}`);
+      onSucess(images.data);
+    } catch (_err) {
+      onFail(_err);
     }
   };
 
   static removeImage = async (image, onSucess, onFail) => {
     const user = await this.getCurrentUser(auth);
-    const image_name = image.name.replace(/\.[^/.]+$/, "");
 
     if (user) {
       storage
         .ref()
         .child(`images/${user}/${image.name}`)
         .delete()
-        .then(res => {
-          firebaseDatabase
-            .collection("/images/")
-            .doc(image_name)
-            .delete()
-            .then(
-              res => onSucess(res),
-              err => onFail(err)
-            );
+        .then(async res => {
+          try {
+            await api.delete(`/images/0?name=${image.name}`);
+            onSucess(res);
+          } catch (_err) {
+            onFail(_err);
+          }
         })
         .catch(err => onFail(err));
     }
