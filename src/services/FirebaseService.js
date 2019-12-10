@@ -55,19 +55,11 @@ export default class FirebaseService {
   }
 
   static loginUser = (email, password, login_sucess_func, login_error_func) => {
-    console.log(email, password);
-    auth
-      .signInWithEmailAndPassword(email, password)
-      .then(function(firebaseUser) {
-        login_sucess_func(firebaseUser);
-      })
-      .catch(function(error) {
-        login_error_func(error);
-        // Handle Errors here.
-        // var errorCode = error.code;
-        // var errorMessage = error.message;
-        // ...
-      });
+    return auth.signInWithEmailAndPassword(email, password);
+  };
+
+  static logoutUser = (sucess, error) => {
+    return auth.signOut();
   };
 
   static uploadImage = async (selectedPhoto, onSucess, onFail) => {

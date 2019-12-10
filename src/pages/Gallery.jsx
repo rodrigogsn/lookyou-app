@@ -24,7 +24,7 @@ import {
   IonActionSheet,
   IonLoading
 } from "@ionic/react";
-import { AppContext } from "../State";
+
 import "./Gallery.scss";
 
 import FirebaseService from "../services/FirebaseService";
@@ -53,11 +53,9 @@ const GalleryPage = () => {
     message: "Carregando..."
   });
 
-  const [selectedImage, setSelectedImage] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(0);
 
   const [showImageViewer, setShowImageViewer] = useState(false);
-
-  const { state, dispatch } = useContext(AppContext);
 
   const fetchImages = async (showLoading = true) => {
     if (showLoading) {
@@ -157,9 +155,8 @@ const GalleryPage = () => {
   });
 
   const look_card = looks.map(function(item, i) {
-    console.log(item);
     return (
-      <IonCard>
+      <IonCard key={i}>
         <IonItem lines="none">
           <IonButton
             color="medium"
@@ -187,9 +184,9 @@ const GalleryPage = () => {
         <IonCardContent>
           <IonGrid>
             <IonRow>
-              {item.images.map(function(image) {
+              {item.images.map(function(image, j) {
                 return (
-                  <div className="image-container">
+                  <div className="image-container" key={j}>
                     <IonImg src={image} />
                   </div>
                 );

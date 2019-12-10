@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
 import {
+  IonPage,
   IonContent,
   IonItem,
   IonLabel,
@@ -10,12 +11,12 @@ import {
   IonLoading
 } from "@ionic/react";
 
-import { AppContext } from "../State";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import AuthActions from "../store/ducks/auth";
 
 import "./Login.scss";
 import logo from "../assets/img/logo.png";
-
-import FirebaseService from "../services/FirebaseService";
 
 import { Plugins } from "@capacitor/core";
 
@@ -37,19 +38,15 @@ const Login = props => {
     message: "Carregando..."
   });
 
-  const { state, dispatch } = useContext(AppContext);
+  const loginUser = (props, email, password) => {
+    const { signInRequest } = props;
 
-  const loginUser = (props, email, password, dispatch) => {
     setLoading({ show: true, message: "Carregando..." });
-    FirebaseService.loginUser(
+
+    signInRequest(
       email,
       password,
       async firebaseUser => {
-        dispatch({
-          type: "setLogin",
-          login_data: firebaseUser
-        });
-
         setObject("user", firebaseUser);
 
         setLoading({ show: false, message: "Carregando..." });
@@ -64,48 +61,53 @@ const Login = props => {
   };
 
   return (
-    <IonContent>
-      <IonImg src={logo} alt="Lookyou Logo" className="logo" />
+    <IonPage>
+      <IonContent>
+        <IonImg src={logo} alt="Lookyou Logo" className="logo" />
 
-      <IonItem>
-        <IonLabel position="floating">Email</IonLabel>
-        <IonInput
-          value={email}
-          onIonChange={e => setEmail(e.detail.value)}
-        ></IonInput>
-      </IonItem>
+        <IonItem>
+          <IonLabel position="floating">Email</IonLabel>
+          <IonInput
+            value={email}
+            onIonChange={e => setEmail(e.detail.value)}
+          ></IonInput>
+        </IonItem>
 
-      <IonItem>
-        <IonLabel position="floating">Senha</IonLabel>
-        <IonInput
-          type="password"
-          value={password}
-          onIonChange={e => setPassword(e.detail.value)}
-        ></IonInput>
-      </IonItem>
+        <IonItem>
+          <IonLabel position="floating">Senha</IonLabel>
+          <IonInput
+            type="password"
+            value={password}
+            onIonChange={e => setPassword(e.detail.value)}
+          ></IonInput>
+        </IonItem>
 
-      <IonButton
-        onClick={() => {
-          loginUser(props, email, password, dispatch);
-        }}
-      >
-        Entrar
-      </IonButton>
+        <IonButton
+          onClick={() => {
+            loginUser(props, email, password);
+          }}
+        >
+          Entrar
+        </IonButton>
 
-      <IonText>
-        <p>
-          Ainda não tem uma conta? <a>Crie sua conta.</a>
-        </p>
-      </IonText>
-      <IonLoading
-        isOpen={loading.show}
-        onDidDismiss={() =>
-          setLoading({ show: false, message: "Carregando..." })
-        }
-        message={loading.message}
-      />
-    </IonContent>
+        <IonText>
+          <p>
+            Ainda não tem uma conta? <a>Crie sua conta.</a>
+          </p>
+        </IonText>
+        <IonLoading
+          isOpen={loading.show}
+          onDidDismiss={() =>
+            setLoading({ show: false, message: "Carregando..." })
+          }
+          message={loading.message}
+        />
+      </IonContent>
+    </IonPage>
   );
 };
 
-export default Login;
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(AuthActions, dispatch);
+
+export default connect(null, mapDispatchToProps)(Login);

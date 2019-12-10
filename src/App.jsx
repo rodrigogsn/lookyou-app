@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React from "react";
 import { Redirect, Route } from "react-router-dom";
 import {
   IonApp,
@@ -10,7 +10,9 @@ import {
   IonTabs
 } from "@ionic/react";
 
-import { AppContext } from "./State";
+import PrivateRoute from "./routes/private";
+
+import { Plugins } from "@capacitor/core";
 
 import { IonReactRouter } from "@ionic/react-router";
 import { shirt, calendar, settings } from "ionicons/icons";
@@ -39,23 +41,9 @@ import "@ionic/react/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 
-const App = () => {
-  const PrivateRoute = ({ component: Component, ...rest }) => {
-    const { state } = useContext(AppContext);
-    return (
-      <Route
-        {...rest}
-        render={props =>
-          state.login_data !== null ? (
-            <Component {...props} />
-          ) : (
-            <Redirect to={{ pathname: "/login" }} />
-          )
-        }
-      />
-    );
-  };
+const { Storage } = Plugins;
 
+const App = () => {
   return (
     <IonApp>
       <IonReactRouter>
@@ -67,7 +55,7 @@ const App = () => {
               exact={true}
             />
             <Route path="/login" component={Login} exact={true} />
-            <Route path="/gallery" component={Gallery} exact={true} />
+            <PrivateRoute path="/gallery" component={Gallery} exact={true} />
             <PrivateRoute path="/calendar" component={Calendar} exact={true} />
             <PrivateRoute path="/settings" component={Settings} exact={true} />
           </IonRouterOutlet>
