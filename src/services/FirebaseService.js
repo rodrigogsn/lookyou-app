@@ -1,5 +1,7 @@
 import { firebaseDatabase, storage, auth } from "../utils/firebaseUtils";
 
+import api from "./api";
+
 export default class FirebaseService {
   static getDataList = (nodePath, callback, size = 10) => {
     let query = firebaseDatabase.ref(nodePath).limitToLast(size);
@@ -79,7 +81,22 @@ export default class FirebaseService {
         .ref()
         .child(`images/${user}/${uuid}.png`)
         .put(uploadPhoto)
-        .then(res => onSucess(res))
+        .then(async res => {
+          const url_response = await res.ref.getDownloadURL().then(url => url);
+          const data = {
+            user_id: user,
+            name: `${uuid}.png`,
+            favorite: 0,
+            url: url_response
+          };
+
+          try {
+            await api.post("/images", data);
+            onSucess(res);
+          } catch (_err) {
+            onFail(_err);
+          }
+        })
         .catch(err => onFail(err));
     }
   };
