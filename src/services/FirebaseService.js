@@ -127,20 +127,59 @@ export default class FirebaseService {
   static listLooks = async (onSucess, onFail) => {
     const user = await this.getCurrentUser(auth);
 
-    if (user) {
-      firebaseDatabase
-        .collection("looks")
-        .where("user_id", "==", user)
-        .get()
-        .then(res => {
-          let data = [];
+    try {
+      const looks = await api.get(`/looks?user_id=${user}`);
+      onSucess(looks.data);
+    } catch (_err) {
+      onFail(_err);
+    }
+  };
 
-          res.forEach(doc => {
-            data.push(doc.data());
-          });
-          onSucess(data);
-        })
-        .catch(err => onFail(err));
+  static addLook = async (name, onSucess, onFail) => {
+    const user = await this.getCurrentUser(auth);
+
+    const data = {
+      user_id: user,
+      name,
+      favorite: 0
+    };
+
+    try {
+      const looks = await api.post(`/looks`, data);
+      onSucess(looks.data);
+    } catch (_err) {
+      onFail(_err);
+    }
+  };
+
+  static alterLook = async (look, onSucess, onFail) => {
+    const user = await this.getCurrentUser(auth);
+
+    const data = {
+      name: look.name,
+      favorite: look.favorite
+    };
+
+    if (user) {
+      try {
+        const retLook = await api.put(`/looks/${look.id}`, data);
+        onSucess(retLook.data);
+      } catch (_err) {
+        onFail(_err);
+      }
+    }
+  };
+
+  static removeLook = async (look, onSucess, onFail) => {
+    const user = await this.getCurrentUser(auth);
+
+    if (user) {
+      try {
+        await api.delete(`/looks/${look.id}`);
+        onSucess(look);
+      } catch (_err) {
+        onFail(_err);
+      }
     }
   };
 }

@@ -21,8 +21,8 @@ import {
   IonSegmentButton,
   IonButton,
   IonText,
-  IonActionSheet,
-  IonLoading
+  IonLoading,
+  IonAlert
 } from "@ionic/react";
 
 import "./Gallery.scss";
@@ -31,7 +31,7 @@ import FirebaseService from "../services/FirebaseService";
 
 import ImgsViewer from "react-images-viewer";
 
-import { add, heart, more, trash } from "ionicons/icons";
+import { add, heart, more, trash, create } from "ionicons/icons";
 
 const { Camera } = Plugins;
 
@@ -41,12 +41,16 @@ const changeView = (newView, setView) => {
 
 const GalleryPage = () => {
   const [view, setView] = useState("pictures");
-  const [showActionSheet1, setShowActionSheet1] = useState(false);
-  const [showActionSheet2, setShowActionSheet2] = useState(false);
   const [itensRef, setItensRef] = useState([]);
   const [imagesURL, setImagesURL] = useState([]);
   const [picture, setPicture] = useState([]);
   const [looks, setLooks] = useState([]);
+
+  const [addlookAlert, setAddlookAlert] = useState(false);
+  const [alterLookNameAlert, setAlterLookNameAlert] = useState({
+    visible: false,
+    ref: null
+  });
 
   const [loading, setLoading] = useState({
     show: false,
@@ -56,6 +60,8 @@ const GalleryPage = () => {
   const [selectedImage, setSelectedImage] = useState(0);
 
   const [showImageViewer, setShowImageViewer] = useState(false);
+
+  const forceUpdate = React.useState()[1].bind(null, {});
 
   const fetchImages = async (showLoading = true) => {
     if (showLoading) {
@@ -101,6 +107,28 @@ const GalleryPage = () => {
         },
         error => {
           setLoading({ show: false, message: "Deletando imagem..." });
+          console.log(error);
+        }
+      );
+    }
+  };
+
+  const deleteLook = async look => {
+    if (window.confirm(`Deseja deletar o look ${look.name}`)) {
+      setLoading({ show: true, message: "Deletando look..." });
+      FirebaseService.removeLook(
+        look,
+        async look => {
+          const temnpLooks = looks.filter(value => {
+            return value.id !== look.id;
+          });
+
+          setLooks(temnpLooks);
+
+          setLoading({ show: false, message: "Deletando look..." });
+        },
+        error => {
+          setLoading({ show: false, message: "Deletando look..." });
           console.log(error);
         }
       );
@@ -155,17 +183,62 @@ const GalleryPage = () => {
   });
 
   const look_card = looks.map(function(item, i) {
+    const color = item.favorite ? "red" : "medium";
     return (
       <IonCard key={i}>
         <IonItem lines="none">
+          <IonButton
+            color={color}
+            strong="true"
+            size="large"
+            slot="end"
+            fill="clear"
+            onClick={() => {
+              let data = {
+                favorite: item.favorite === 0 ? 1 : 0,
+                id: item.id,
+                name: item.name
+              };
+
+              FirebaseService.alterLook(
+                data,
+                async retLook => {
+                  const foundIndex = looks.findIndex(x => x.id === retLook.id);
+                  let temnpLooks = looks;
+                  temnpLooks[foundIndex] = retLook;
+
+                  setLooks(temnpLooks);
+                  forceUpdate();
+                },
+                error => {
+                  console.log(error);
+                }
+              );
+            }}
+          >
+            <IonIcon icon={heart}></IonIcon>
+          </IonButton>
           <IonButton
             color="medium"
             strong="true"
             size="large"
             slot="end"
             fill="clear"
+            onClick={() => {
+              deleteLook(item);
+            }}
           >
-            <IonIcon icon={heart}></IonIcon>
+            <IonIcon icon={trash}></IonIcon>
+          </IonButton>
+          <IonButton
+            color="medium"
+            strong="true"
+            size="large"
+            slot="end"
+            fill="clear"
+            onClick={() => setAlterLookNameAlert({ visible: true, ref: item })}
+          >
+            <IonIcon icon={create}></IonIcon>
           </IonButton>
           <IonButton
             color="medium"
@@ -184,7 +257,7 @@ const GalleryPage = () => {
         <IonCardContent>
           <IonGrid>
             <IonRow>
-              {item.images.map(function(image, j) {
+              {item.look_images.map(function(image, j) {
                 return (
                   <div className="image-container" key={j}>
                     <IonImg src={image} />
@@ -222,7 +295,7 @@ const GalleryPage = () => {
         {look_card}
 
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton onClick={() => setShowActionSheet2(true)}>
+          <IonFabButton onClick={() => setAddlookAlert(true)}>
             <IonIcon icon={add}></IonIcon>
           </IonFabButton>
         </IonFab>
@@ -257,37 +330,6 @@ const GalleryPage = () => {
 
         {viewContent}
 
-        <IonActionSheet
-          isOpen={showActionSheet1}
-          onDidDismiss={() => setShowActionSheet1(false)}
-          buttons={[
-            {
-              text: "Tirar Foto",
-              handler: () => {
-                takePicture();
-              }
-            },
-            {
-              text: "Carregar Foto",
-              handler: () => {
-                console.log("Carregar Foto");
-              }
-            }
-          ]}
-        ></IonActionSheet>
-
-        <IonActionSheet
-          isOpen={showActionSheet2}
-          onDidDismiss={() => setShowActionSheet2(false)}
-          buttons={[
-            {
-              text: "Adicionar novo look",
-              handler: () => {
-                console.log("Adicionar novo look");
-              }
-            }
-          ]}
-        ></IonActionSheet>
         <ImgsViewer
           imgs={imagesURL.map(function(image) {
             return { src: image };
@@ -313,6 +355,104 @@ const GalleryPage = () => {
             setLoading({ show: false, message: "Carregando..." })
           }
           message={loading.message}
+        />
+
+        <IonAlert
+          isOpen={addlookAlert}
+          onDidDismiss={() => setAddlookAlert(false)}
+          header={"Novo Look!"}
+          message={"Qual o nome do Look?"}
+          inputs={[
+            {
+              name: "name",
+              type: "text",
+              placeholder: "Nome do Look"
+            }
+          ]}
+          buttons={[
+            {
+              text: "Cancelar",
+              role: "cancel",
+              cssClass: "secondary",
+              handler: value => {}
+            },
+            {
+              text: "Gravar",
+              handler: value => {
+                setLoading({ show: true, message: "Salvando Look..." });
+                FirebaseService.addLook(
+                  value.name,
+                  async newlook => {
+                    const temnpLooks = looks;
+                    temnpLooks.push(newlook);
+
+                    setLooks(temnpLooks);
+                    setLoading({ show: false, message: "Salvando Look..." });
+                  },
+                  error => {
+                    setLoading({
+                      show: false,
+                      message: "Salvando Look ..."
+                    });
+                    console.log(error);
+                  }
+                );
+              }
+            }
+          ]}
+        />
+
+        <IonAlert
+          isOpen={alterLookNameAlert.visible}
+          onDidDismiss={() =>
+            setAlterLookNameAlert({ visible: false, ref: null })
+          }
+          header={"Alterar Nome!"}
+          message={"Qual o novo Nome do Look?"}
+          inputs={[
+            {
+              name: "name",
+              type: "text",
+              placeholder: "Nome do Look"
+            }
+          ]}
+          buttons={[
+            {
+              text: "Cancelar",
+              role: "cancel",
+              cssClass: "secondary",
+              handler: value => {}
+            },
+            {
+              text: "Alterar",
+              handler: value => {
+                setLoading({ show: true, message: "Alterando Nome..." });
+                alterLookNameAlert.ref.name = value.name;
+
+                FirebaseService.alterLook(
+                  alterLookNameAlert.ref,
+                  async retLook => {
+                    const foundIndex = looks.findIndex(
+                      x => x.id === retLook.id
+                    );
+                    let temnpLooks = looks;
+                    temnpLooks[foundIndex] = retLook;
+
+                    setLooks(temnpLooks);
+
+                    setLoading({ show: false, message: "Alterando Nome..." });
+                  },
+                  error => {
+                    setLoading({
+                      show: false,
+                      message: "Alterando Nome ..."
+                    });
+                    console.log(error);
+                  }
+                );
+              }
+            }
+          ]}
         />
       </IonContent>
     </IonPage>
