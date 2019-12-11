@@ -98,9 +98,10 @@ export default class FirebaseService {
 
     try {
       const images = await api.get(`/images?user_id=${user}`);
-      onSucess(images.data);
+      return images;
+      // onSucess(images.data);
     } catch (_err) {
-      onFail(_err);
+      // onFail(_err);
     }
   };
 

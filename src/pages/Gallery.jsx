@@ -29,9 +29,15 @@ import "./Gallery.scss";
 
 import FirebaseService from "../services/FirebaseService";
 
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import FirebaseImageActions from "../store/ducks/firebaseImages";
+
 import ImgsViewer from "react-images-viewer";
 
 import { add, heart, more, trash, create } from "ionicons/icons";
+
+import store from "../store";
 
 const { Camera } = Plugins;
 
@@ -39,7 +45,7 @@ const changeView = (newView, setView) => {
   setView(newView);
 };
 
-const GalleryPage = () => {
+const GalleryPage = props => {
   const [view, setView] = useState("pictures");
   const [itensRef, setItensRef] = useState([]);
   const [imagesURL, setImagesURL] = useState([]);
@@ -67,15 +73,14 @@ const GalleryPage = () => {
     if (showLoading) {
       setLoading({ show: true, message: "Carregando imagens..." });
     }
-    FirebaseService.getImagesStore(
+    const { listImages } = props;
+
+    listImages(
       async images => {
-        setItensRef(images);
+        const state_images = store.getState().firebaseImages;
+        setItensRef(state_images.images);
 
-        var urls = images.map(function(item) {
-          return item.url;
-        });
-
-        setImagesURL(urls);
+        setImagesURL(state_images.imagesURL);
 
         FirebaseService.listLooks(
           async looks => {
@@ -459,4 +464,7 @@ const GalleryPage = () => {
   );
 };
 
-export default GalleryPage;
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(FirebaseImageActions, dispatch);
+
+export default connect(null, mapDispatchToProps)(GalleryPage);

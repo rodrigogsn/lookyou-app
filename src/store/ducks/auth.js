@@ -1,5 +1,9 @@
 import { createReducer, createActions } from "reduxsauce";
-import { storage_get, storage_set, storage_remove } from "../../services/storage";
+import {
+  storage_get,
+  storage_set,
+  storage_remove
+} from "../../services/storage";
 
 const { Types, Creators } = createActions({
   signInRequest: ["email", "password", "onSuccess", "onError"],
@@ -29,5 +33,5 @@ export const logout = state => {
 
 export const reducer = createReducer(INITIAL_STATE, {
   [Types.SIGN_IN_SUCCESS]: success,
-  [Types.SIGN_IN_SUCCESS]: logout
+  [Types.SIGN_OUT]: logout
 });
