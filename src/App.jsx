@@ -12,8 +12,6 @@ import {
 
 import PrivateRoute from "./routes/private";
 
-import { Plugins } from "@capacitor/core";
-
 import { IonReactRouter } from "@ionic/react-router";
 import { shirt, calendar, settings } from "ionicons/icons";
 
@@ -41,9 +39,10 @@ import "@ionic/react/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 
-const { Storage } = Plugins;
+import store from "./store";
 
 const App = () => {
+  const redirect = store.getState().auth.signedIn ? "/gallery" : "/login";
   return (
     <IonApp>
       <IonReactRouter>
@@ -51,7 +50,7 @@ const App = () => {
           <IonRouterOutlet>
             <Route
               path="/"
-              render={() => <Redirect to="/login" />}
+              render={() => <Redirect to={redirect} />}
               exact={true}
             />
             <Route path="/login" component={Login} exact={true} />

@@ -18,17 +18,6 @@ import AuthActions from "../store/ducks/auth";
 import "./Login.scss";
 import logo from "../assets/img/logo.png";
 
-import { Plugins } from "@capacitor/core";
-
-const { Storage } = Plugins;
-
-const setObject = async (name, value) => {
-  await Storage.set({
-    key: name,
-    value: JSON.stringify(value)
-  });
-};
-
 const Login = props => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,8 +36,6 @@ const Login = props => {
       email,
       password,
       async firebaseUser => {
-        setObject("user", firebaseUser);
-
         setLoading({ show: false, message: "Carregando..." });
 
         props.history.push("/gallery");
