@@ -37,6 +37,10 @@ import ImgsViewer from "react-images-viewer";
 
 import { add, heart, more, trash, create } from "ionicons/icons";
 
+import { SelectImageModal } from '../components/modal/selectImage';
+
+import LongPress from '../components/longPress';
+
 import store from "../store";
 
 const { Camera } = Plugins;
@@ -66,6 +70,11 @@ const GalleryPage = props => {
   const [selectedImage, setSelectedImage] = useState(0);
 
   const [showImageViewer, setShowImageViewer] = useState(false);
+
+  const [showModal, setShowModal] = useState({
+    visible: false,
+    ref: null
+  });
 
   const forceUpdate = React.useState()[1].bind(null, {});
 
@@ -265,14 +274,37 @@ const GalleryPage = props => {
               {item.look_images.map(function(image, j) {
                 return (
                   <div className="image-container" key={j}>
-                    <IonImg src={image} />
+                    <LongPress
+                      time={1000}
+                      onLongPress={()=>{
+                        var confirm = window.confirm("Deletar a foto desse Look?");
+
+                        if (confirm) {
+                          setLoading({ show: true, message: "Deletando Imagem..." });
+            
+                          FirebaseService.removeImageLook(
+                            image.id,
+                            async (res) => {
+                              fetchImages(false);
+                              console.log(res);
+                            },
+                            error => {
+                              setLoading({ show: false, message: "Deletando Imagem..." });
+                              console.log(error);
+                            }
+                          );
+                        }
+                      }}
+                    >
+                      <IonImg src={image.images.url} />
+                    </LongPress>
                   </div>
                 );
               })}
             </IonRow>
           </IonGrid>
 
-          <IonButton fill="outline">
+          <IonButton fill="outline" onClick={() => setShowModal({visible:true, ref: item})}>
             <IonIcon icon={add}></IonIcon> Peças
           </IonButton>
         </IonCardContent>
@@ -458,6 +490,35 @@ const GalleryPage = props => {
               }
             }
           ]}
+        />
+
+        <SelectImageModal 
+          showModal={showModal.visible} 
+          item={showModal.ref} 
+          itensRef={itensRef} 
+          imagesURL={imagesURL} 
+          setShowModal={setShowModal}
+          onSelectImage={(image_id)=>{
+            var confirm = window.confirm("Selecionar essa imagem para o Look?");
+
+            if (confirm) {
+              setLoading({ show: true, message: "Salvando Imagem..." });
+
+              FirebaseService.addImageLook(
+                image_id,
+                showModal.ref.id,
+                async (res) => {
+                  fetchImages(false);
+                  setShowModal({visible: false, ref: null});
+                  console.log(res);
+                },
+                error => {
+                  setLoading({ show: false, message: "Salvando Imagem..." });
+                  console.log(error);
+                }
+              );
+            }
+          }}
         />
       </IonContent>
     </IonPage>

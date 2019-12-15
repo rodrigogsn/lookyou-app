@@ -183,4 +183,28 @@ export default class FirebaseService {
       }
     }
   };
+
+  static addImageLook = async (image_id, look_id, onSucess, onFail) => {
+
+    const data = {
+      look_id,
+      image_id
+    };
+
+    try {
+      const images = await api.post(`/look_images`, data);
+      onSucess(images.data);
+    } catch (_err) {
+      onFail(_err);
+    }
+  };
+
+  static removeImageLook = async (image_id, onSucess, onFail) => {
+    try {
+      await api.delete(`/look_images/${image_id}`);
+      onSucess();
+    } catch (_err) {
+      onFail(_err);
+    }
+  };
 }
